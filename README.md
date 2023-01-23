@@ -1,2 +1,2 @@
 # Datalemur
-SQL questions I've solved on datalemur
+Contains solutions of Datalemur, HackerRank and SQLzoo questions.
