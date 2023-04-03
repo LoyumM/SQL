@@ -16,3 +16,5 @@ WHERE continent = 'Europe'
   SELECT gdp/population
     FROM world
     WHERE name = 'United Kingdom');
+
+--3.
