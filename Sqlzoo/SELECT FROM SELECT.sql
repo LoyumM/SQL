@@ -56,3 +56,58 @@ WHERE continent = 'Europe');
 
 -- 7.Find the largest country (by area) in each continent, show the continent, the name and the area:
 
+SELECT a.continent, a.name, a.area
+FROM world AS a
+WHERE a.area = (
+  SELECT MAX(b.area)
+FROM world AS b
+WHERE a.continent = b.continent
+);
+
+-- OR
+
+SELECT continent, name, area
+FROM world AS a
+WHERE area >= ALL(
+  SELECT area
+FROM world AS b
+WHERE a.continent = b.continent
+);
+
+-- 8.List each continent and the name of the country that comes first alphabetically.
+
+SELECT continent, name
+FROM world a
+WHERE name <= ALL (
+  SELECT name
+FROM world b
+WHERE a.continent = b.continent
+);
+
+-- OR
+
+SELECT continent, MIN(name) AS country
+FROM world
+GROUP BY continent;
+
+-- 9.Find the continents where all countries have a population <= 25000000. Then find the names of the countries associated with these continents. Show name, continent and population.
+
+SELECT name, continent, population
+FROM world
+WHERE continent IN (
+  SELECT continent
+FROM world
+GROUP BY continent
+HAVING MAX(population) <= 25000000
+);
+
+-- 10.Some countries have populations more than three times that of all of their neighbours (in the same continent). Give the countries and continents.
+
+SELECT name, continent
+FROM world AS a
+WHERE  population > 
+       (SELECT 3 * MAX(population)
+FROM world AS b
+WHERE  a.continent = b.continent
+  AND a.name <> b.name);
+  -- x.name <> y.name is there so that it doesnt check against itself, otherwise it wont work as x > 3x doesnt make sense.
