@@ -111,4 +111,4 @@ WHERE movie.id IN (SELECT movieid
     FROM casting
         JOIN actor ON id =actorid
     WHERE name = 'art garfunkel')
-    AND name <> 'art garfunkel'
+    AND name <> 'art garfunkel';
