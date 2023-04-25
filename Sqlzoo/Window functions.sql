@@ -48,12 +48,11 @@ WHERE position = 1;
 --6. You can use COUNT and GROUP BY to see how each party did in Scotland. Scottish constituencies start with 'S'
 --Show how many seats for each party in Scotland in 2017.
 
-SELECT party, COUNT(1)
-FROM(SELECT constituency, party
-    FROM (SELECT constituency, party, votes,
-            RANK() OVER (PARTITION BY constituency ORDER BY votes DESC) AS rank
-        FROM ge
-        WHERE constituency LIKE 'S%'
-            AND yr = 2017) a
-    WHERE a.rank = 1) b
+SELECT party, COUNT(1) AS total_seats
+FROM(SELECT constituency, party, votes,
+        RANK() OVER (PARTITION BY constituency ORDER BY votes DESC) AS rank
+    FROM ge
+    WHERE constituency LIKE 'S%'
+        AND yr = 2017) a
+WHERE a.rank = 1
 GROUP BY party;
