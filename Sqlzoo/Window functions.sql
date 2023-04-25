@@ -36,3 +36,11 @@ ORDER BY position, constituency;
 -- 5.You can use SELECT within SELECT to pick out only the winners in Edinburgh. Show the
 -- parties that won for each Edinburgh constituency in 2017.
 
+SELECT constituency, party
+FROM(SELECT constituency, party, votes,
+        RANK() OVER (PARTITION BY constituency ORDER by VOTES desc) 
+      AS position
+    FROM ge
+    WHERE constituency BETWEEN 'S14000021' AND 'S14000026'
+        AND yr  = 2017) a
+WHERE position = 1;
