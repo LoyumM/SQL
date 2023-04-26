@@ -31,7 +31,8 @@ WHERE name = 'Italy'
     AND MONTH(whn) = 3 AND YEAR(whn) = 2020
 ORDER BY whn;
 
--- 4.The data gathered are necessarily estimates and are inaccurate. However by taking a longer time span we can mitigate some of the effects.
+-- 4.The data gathered are necessarily estimates and are inaccurate. However by taking a 
+-- longer time span we can mitigate some of the effects.
 -- You can filter the data to view only Monday's figures WHERE WEEKDAY(whn) = 0.
 -- Show the number of new cases in Italy for each week in 2020 - show Monday only.
 
@@ -65,3 +66,29 @@ WHERE tw.name = 'Italy'
     AND WEEKDAY
 (tw.whn) = 0
 ORDER BY tw.whn;
+
+-- 6.This query shows the number of confirmed cases together with the world ranking for cases for the
+-- date '2020-04-20'. The number of COVID deaths is also shown. United States has the highest number, 
+-- Spain is number 2... Notice that while Spain has the second highest confirmed cases, Italy has the 
+-- second highest number of deaths due to the virus. Add a column to show the ranking for the number 
+-- of deaths due to COVID.
+
+SELECT name, confirmed,
+    RANK() OVER (ORDER BY confirmed DESC) AS confirmed_ranked,
+    deaths,
+    RANK() OVER (ORDER BY deaths DESC) AS deaths_ranked
+FROM covid
+WHERE whn = '2020-04-20'
+ORDER BY confirmed DESC, deaths DESC;
+
+-- 7.This query includes a JOIN t the world table so we can access the total population of each country 
+-- and calculate infection rates (in cases per 100,000). Show the infection rate ranking for each country. 
+-- Only include countries with a population of at least 10 million.
+
+SELECT world.name,
+    ROUND(100000*confirmed/population,2) AS infection_rate,
+    RANK() OVER (ORDER BY infection_rate DESC) infection_rank
+FROM covid JOIN world ON covid.name = world.name
+WHERE whn = '2020-04-20'
+    AND population > 10000000
+ORDER BY population DESC;
