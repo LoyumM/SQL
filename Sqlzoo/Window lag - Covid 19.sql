@@ -87,7 +87,7 @@ ORDER BY confirmed DESC, deaths DESC;
 
 SELECT world.name,
     ROUND(100000*confirmed/population,2) AS infection_rate,
-    RANK() OVER (ORDER BY infection_rate DESC) infection_rank
+    ROW_NUMBER() OVER (ORDER BY infection_rate) AS infection_rank
 FROM covid JOIN world ON covid.name = world.name
 WHERE whn = '2020-04-20'
     AND population > 10000000
