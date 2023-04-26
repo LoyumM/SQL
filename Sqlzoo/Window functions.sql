@@ -56,3 +56,4 @@ FROM(SELECT constituency, party, votes,
         AND yr = 2017) a
 WHERE a.rank = 1
 GROUP BY party;
+

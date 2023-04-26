@@ -60,12 +60,10 @@ ORDER BY whn;
 
 SELECT tw.name, DATE_FORMAT(tw.whn,'%Y-%m-%d') AS date, (tw.confirmed-lw.confirmed) AS new_cases
 FROM covid tw LEFT JOIN covid lw ON DATE_ADD(lw.whn, INTERVAL
-1 WEEK) = tw.whn
-    AND tw.name=lw.name
-WHERE tw.name = 'Italy'
-    AND WEEKDAY
-(tw.whn) = 0
-ORDER BY tw.whn;
+1 WEEK) = tw.whn AND tw.name=lw.name
+WHERE tw.name = 'Italy' AND
+(WEEKDAY
+(tw.whn) = 0) ORDER BY tw.whn;
 
 -- 6.This query shows the number of confirmed cases together with the world ranking for cases for the
 -- date '2020-04-20'. The number of COVID deaths is also shown. United States has the highest number, 
@@ -92,3 +90,24 @@ FROM covid JOIN world ON covid.name = world.name
 WHERE whn = '2020-04-20'
     AND population > 10000000
 ORDER BY population DESC;
+
+-- 8.For each country that has had at last 1000 new cases in a single day, show the date of the peak number of new cases.
+
+WITH
+    temp
+    AS
+    (
+        SELECT name,
+            DATE_FORMAT(whn, '%Y-%m-%d') AS date,
+            (confirmed - LAG(confirmed, 1) OVER(PARTITION BY name ORDER 
+            BY whn)) AS new_cases
+        FROM covid
+        ORDER BY name, whn
+    )
+
+
+SELECT name, date, new_cases,
+    ROW_NUMBER() OVER(PARTITION BY name ORDER BY newcases DESC) AS rank
+FROM temp
+WHERE new_cases > 999
+    AND rank = 1;
