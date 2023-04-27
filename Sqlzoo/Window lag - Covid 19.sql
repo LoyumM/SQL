@@ -111,3 +111,29 @@ SELECT name, date, new_cases,
 FROM temp
 WHERE new_cases > 999
     AND rank = 1;
+
+
+-- 8. For each country that has had at last 1000 new cases in a single day, show the date of the peak number of new cases.
+
+WITH
+    temp1
+    as
+    (
+        SELECT name, DATE_FORMAT(whn, '%Y-%m-%d') as date,
+            confirmed - LAG(confirmed, 1) OVER (PARTITION BY name ORDER BY DATE(whn)) as new_cases
+        FROM covid
+        ORDER BY whn
+    ),
+    temp2
+    AS
+    (
+        SELECT name, MAX(new_cases) as peak_cases
+        FROM temp1
+        WHERE new_cases >= 1000
+        GROUP BY name
+        ORDER BY date
+    )
+SELECT t1.name, t1.date, t2.peak_cases
+FROM temp1 as t1
+    JOIN temp2 as t2
+    ON t1.name=t2.name AND t1.new_cases=t2.peak_cases;
