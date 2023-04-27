@@ -58,12 +58,13 @@ ORDER BY whn;
 -- Show the number of new cases in Italy for each week - show Monday only.
 -- In the sample query we JOIN this week tw with last week lw using the DATE_ADD function.
 
-SELECT tw.name, DATE_FORMAT(tw.whn,'%Y-%m-%d') AS date, (tw.confirmed-lw.confirmed) AS new_cases
-FROM covid tw LEFT JOIN covid lw ON DATE_ADD(lw.whn, INTERVAL
-1 WEEK) = tw.whn AND tw.name=lw.name
-WHERE tw.name = 'Italy' AND
-(WEEKDAY
-(tw.whn) = 0) ORDER BY tw.whn;
+SELECT tw.name, DATE_FORMAT(tw.whn,'%Y-%m-%d') AS date, 
+    (tw.confirmed-lw.confirmed) AS new_cases
+FROM covid tw LEFT JOIN covid lw ON DATE_ADD(lw.whn, INTERVAL 1 WEEK) = tw.whn 
+    AND tw.name=lw.name
+WHERE tw.name = 'Italy' 
+   AND(WEEKDAY(tw.whn) = 0) 
+ORDER BY tw.whn;
 
 -- 6.This query shows the number of confirmed cases together with the world ranking for cases for the
 -- date '2020-04-20'. The number of COVID deaths is also shown. United States has the highest number, 
@@ -93,19 +94,13 @@ ORDER BY population DESC;
 
 -- 8.For each country that has had at last 1000 new cases in a single day, show the date of the peak number of new cases.
 
-WITH
-    temp
-    AS
-    (
+WITH temp AS(
         SELECT name,
             DATE_FORMAT(whn, '%Y-%m-%d') AS date,
-            (confirmed - LAG(confirmed, 1) OVER(PARTITION BY name ORDER 
-            BY whn)) AS new_cases
+            (confirmed - LAG(confirmed, 1) OVER(PARTITION BY name ORDER BY whn)) AS new_cases
         FROM covid
         ORDER BY name, whn
     )
-
-
 SELECT name, date, new_cases,
     ROW_NUMBER() OVER(PARTITION BY name ORDER BY newcases DESC) AS rank
 FROM temp
@@ -115,17 +110,13 @@ WHERE new_cases > 999
 
 -- 8. For each country that has had at last 1000 new cases in a single day, show the date of the peak number of new cases.
 
-WITH
-    temp1
-    as
-    (
+WITH temp1 AS (
         SELECT name, DATE_FORMAT(whn, '%Y-%m-%d') as date,
             confirmed - LAG(confirmed, 1) OVER (PARTITION BY name ORDER BY DATE(whn)) as new_cases
         FROM covid
         ORDER BY whn
     ),
-    temp2
-    AS
+    temp2 AS
     (
         SELECT name, MAX(new_cases) as peak_cases
         FROM temp1
