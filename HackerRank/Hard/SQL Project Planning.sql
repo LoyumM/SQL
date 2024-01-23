@@ -9,17 +9,17 @@ WITH
         FROM Projects
     )
 
+SELECT x.mindate, x.maxdate
+FROM (
 SELECT
-    start_date,
-    end_date,
-    CASE 
+        MIN(Start_date) AS mindate,
+        MAX(End_date) AS maxdate,
+        CASE 
         WHEN DATEDIFF(End_date, Start_date) =1
-        AND (lag_date = start_date OR lag_date IS NULL) 
-        THEN
-@n:
-=@n 
-    ELSE
-@n:
-=@n+1
-END AS val 
-FROM CTE;
+            AND (lag_date = start_date OR lag_date IS NULL) 
+        THEN @n:=@n 
+    ELSE @n:=@n+1 
+    END AS val
+    FROM CTE
+    GROUP BY val
+    ORDER BY COUNT(val), MIN(start_date)) x
