@@ -1,11 +1,7 @@
-/*
-Enter your query here.
-*/
-
 WITH
     cte
     AS
-    
+
     (
         SELECT
             s.hacker_id,
